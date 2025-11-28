@@ -1,0 +1,33 @@
+{
+  "name": "@imatic/whisperer",
+  "version": "1.0.0",
+  "license": "MIT",
+  "repository": "git@github.com:Imatic-IT/imatic-mantis-whisperer.git",
+  "private": false,
+  "scripts": {
+    "build": "NODE_ENV=production webpack",
+    "build:dev": "NODE_ENV=development webpack",
+    "watch": "NODE_ENV=development webpack --watch",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "typescript",
+    "course"
+  ],
+  "author": "Maximilian Schwarzmüller",
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "prettier": "^3.3.3",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.2",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "dependencies": {
+    "flatpickr": "^4.6.13",
+    "lodash": "^4.17.21",
+    "zod": "^3.23.8"
+  }
+}

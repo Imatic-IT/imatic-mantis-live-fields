@@ -1,0 +1,9 @@
+.inline-feedback-success {
+    background-color: #31ff61 !important; /* zelená */
+    transition: background-color 0.5s;
+}
+
+.inline-feedback-error {
+    background-color: #fd981d !important; /* červená */
+    transition: background-color 0.5s;
+}
