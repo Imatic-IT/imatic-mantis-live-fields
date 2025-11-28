@@ -36,7 +36,7 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
                 ],
                 'bug-custom-field' => [
                     [
-                        'field_id' => 8, // PROD id 2 dev 8
+                        'field_id' => 2, // PROD id 2 dev 8
                         'field' => 'bug-custom-field',
                         'title' => 'plánováno',
                         'type' => 'date'
