@@ -24,3 +24,12 @@ export function getBugIdFromUrl(): number | null {
     const id = params.get('id');
     return id ? parseInt(id) : null;
 }
+
+export function hover(td: HTMLElement) {
+    td.addEventListener('mouseenter', () => {
+        td.style.backgroundColor = '#f0f8ff';
+    });
+    td.addEventListener('mouseleave', () => {
+        td.style.backgroundColor = '';
+    });
+}

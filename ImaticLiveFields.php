@@ -26,13 +26,17 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
                     'field' => 'description',
                     'type' => 'textarea',
                 ],
+                'bug-summary' => [
+                    'field' => 'summary',
+                    'type' => 'text',
+                ],
                 'bug-additional-information' => [
                     'field' => 'additional_information',
                     'type' => 'textarea',
                 ],
                 'bug-custom-field' => [
                     [
-                        'field_id' => 2, // PROD id 2 dev 8
+                        'field_id' => 8, // PROD id 2 dev 8
                         'field' => 'bug-custom-field',
                         'title' => 'plánováno',
                         'type' => 'date'

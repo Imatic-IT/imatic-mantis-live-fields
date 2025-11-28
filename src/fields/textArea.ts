@@ -1,10 +1,29 @@
 import {Field} from '../types/types';
 import {ajaxUpdateField} from "../utils/ajaxUpdateField";
 
-export function setupInlineTextareaField(editIcon: HTMLElement, field: Field) {
-    const td = editIcon.parentElement as HTMLElement;
+function hover(td: HTMLElement) {
+    td.addEventListener('mouseenter', () => {
+        td.style.backgroundColor = '#f0f8ff';
+    });
+    td.addEventListener('mouseleave', () => {
+        td.style.backgroundColor = '';
+    });
+}
 
-    editIcon.addEventListener('click', () => {
+export function setupInlineTextareaField(
+    td: HTMLElement,
+    field: Field
+) {
+
+    hover(td);
+
+    td.addEventListener('click', () => {
+
+        const selection = window.getSelection();
+        if (selection && selection.toString().length > 0) {
+            return;
+        }
+
         if (td.querySelector('textarea')) return;
 
         const currentValue = td.textContent?.trim() || '';
@@ -35,7 +54,6 @@ export function setupInlineTextareaField(editIcon: HTMLElement, field: Field) {
 
             if (response.success) {
                 td.textContent = value;
-                td.prepend(editIcon);
 
                 td.classList.add('inline-feedback-success');
                 setTimeout(() => td.classList.remove('inline-feedback-success'), 1000);
@@ -44,14 +62,12 @@ export function setupInlineTextareaField(editIcon: HTMLElement, field: Field) {
                 setTimeout(() => td.classList.remove('inline-feedback-error'), 1000);
 
                 td.textContent = currentValue;
-                td.prepend(editIcon);
             }
         });
 
         cancelBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             td.textContent = currentValue;
-            td.prepend(editIcon);
         });
 
         textarea.focus();

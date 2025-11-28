@@ -10,7 +10,7 @@ interface AjaxUpdateResponse {
 
 export async function ajaxUpdateField(
     field: Field,
-    value: string,
+    value?: string | null,
 ): Promise<AjaxUpdateResponse> {
     const config = getConfig();
 
@@ -24,7 +24,7 @@ export async function ajaxUpdateField(
     const data = new FormData();
     data.append('field', field.field);
     data.append('type', field.type);
-    data.append('value', value);
+    data.append('value', value ?? '');
 
     if (field.field_id) data.append('custom_field_id', field.field_id.toString());
 

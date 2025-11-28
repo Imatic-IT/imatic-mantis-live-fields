@@ -32,7 +32,16 @@ function parseDateToTimestamp(string $input): int
 try {
     $isDate = $type === 'date';
     $isCustom = isset($_POST['custom_field_id']);
-    $valueToWrite = $isDate ? parseDateToTimestamp($value) : $value;
+    $valueToWrite = $value;
+
+    if ($isDate) {
+        $raw = trim($value);
+        if ($raw === '') {
+            $valueToWrite = $isCustom ? '' : 1;
+        } else {
+            $valueToWrite = parseDateToTimestamp($raw);
+        }
+    }
 
     if ($isCustom) {
         $id = (int)$_POST['custom_field_id'];

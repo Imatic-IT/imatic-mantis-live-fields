@@ -1,8 +1,9 @@
-import {showEditIcon} from "../utils/utils";
-import {getConfig} from "../utils/utils";
-import {setupInlineDateField} from "../fields/dateField"
 import {Field} from '../types/types'
+import {getConfig} from "../utils/utils";
+import {showEditIcon} from "../utils/utils";
+import {setupInlineDateField} from "../fields/date"
 import {setupInlineTextareaField} from "../fields/textArea";
+import {setupInlineTextField} from "../fields/text";
 
 function applyInlineEditComponent(
     cell: HTMLElement,
@@ -20,9 +21,11 @@ function applyInlineEditComponent(
         setupInlineDateField(editIcon, field);
 
     } else if (field.type === 'textarea') {
-        const editIcon = showEditIcon(cell);
-        setupInlineTextareaField(editIcon, field);
+        setupInlineTextareaField(cell, field);
+    } else if (field.type === 'text') {
+        setupInlineTextField(cell, field);
     }
+
 }
 
 function getCells(selector: string) {

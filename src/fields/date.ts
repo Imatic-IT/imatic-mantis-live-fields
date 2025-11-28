@@ -44,15 +44,18 @@ export function setupInlineDateField(
 
         saveBtn.addEventListener('click', async (event) => {
             event.stopPropagation();
-            const value = input.value;
+
+            let value = input.value.trim();
+
+            const payload = value === '' ? null : value;
 
             const response = await ajaxUpdateField(
                 field,
-                value,
+                payload,
             );
 
             if (response.success) {
-                td.textContent = value;
+                td.textContent = payload;
                 td.prepend(editIcon);
 
                 td.classList.add('inline-feedback-success');
