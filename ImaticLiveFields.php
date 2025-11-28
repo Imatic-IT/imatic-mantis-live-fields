@@ -52,7 +52,7 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
     function eventLayoutPageFooter()
     {
         $bug_id = gpc_get_int('id', null);
-q
+
         if ($bug_id == null) {
             return;
         }
