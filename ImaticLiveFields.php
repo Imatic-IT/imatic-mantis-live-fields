@@ -7,7 +7,7 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
         $this->name = 'ImaticLiveFields';
         $this->description = 'Inline editing of fields on issue view page.';
         $this->page = 'config';
-        $this->version = '0.0.0';
+        $this->version = '0.0.1';
         $this->requires = array('MantisCore' => '2.0.0');
         $this->author = 'Imatic Software s.r.o.';
         $this->contact = 'info@imatic.cz';
@@ -51,6 +51,20 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
 
     function eventLayoutPageFooter()
     {
+        $bug_id = gpc_get_int('id', null);
+q
+        if ($bug_id == null) {
+            return;
+        }
+
+        $t_issue_readonly = bug_is_readonly( $bug_id );
+
+        $canEdit = !$t_issue_readonly && access_has_bug_level( config_get( 'update_bug_threshold' ), $bug_id );
+
+        if (!$canEdit) {
+            return;
+        }
+
         $config = $this->config();
 
         $configForJs = [
