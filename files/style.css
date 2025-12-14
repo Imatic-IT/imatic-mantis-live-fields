@@ -7,3 +7,52 @@
     background-color: #fd981d !important; /* červená */
     transition: background-color 0.5s;
 }
+
+
+/* LOADER*/
+.imatic-live-field-loader {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: block;
+    margin: 10px auto;
+    position: relative;
+    background: #FFF;
+    box-shadow: -24px 0 #FFF, 24px 0 #FFF;
+    box-sizing: border-box;
+    animation: shadowPulse 2s linear infinite;
+}
+
+@keyframes shadowPulse {
+    33% {
+        background: #FFF;
+        box-shadow: -24px 0 #5090C1, 24px 0 #FFF;
+    }
+    66% {
+        background: #5090C1;
+        box-shadow: -24px 0 #FFF, 24px 0 #FFF;
+    }
+    100% {
+        background: #FFF;
+        box-shadow: -24px 0 #FFF, 24px 0 #5090C1;
+    }
+}
+
+/* Input */
+.custom-datepicker .react-datepicker__input-container input {
+    width: 100%;        /* input vyplní celú TD bunku */
+    font-size: 14px;    /* väčší text */
+    padding: 6px 8px;   /* lepšie kliknutie */
+    box-sizing: border-box;
+}
+
+/* Wrapper */
+.custom-datepicker .react-datepicker-wrapper {
+    width: 100%;        /* aby wrapper nezmenšoval input */
+}
+
+/* Dropdown kalendár */
+.custom-datepicker .react-datepicker__calendar {
+    font-size: 14px;    /* väčšie písmo v kalendári */
+    width: 250px;       /* širší dropdown */
+}

@@ -7,7 +7,7 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
         $this->name = 'ImaticLiveFields';
         $this->description = 'Inline editing of fields on issue view page.';
         $this->page = 'config';
-        $this->version = '0.0.1';
+        $this->version = '0.1.0';
         $this->requires = array('MantisCore' => '2.0.0');
         $this->author = 'Imatic Software s.r.o.';
         $this->contact = 'info@imatic.cz';
@@ -33,6 +33,14 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
                 'bug-additional-information' => [
                     'field' => 'additional_information',
                     'type' => 'textarea',
+                ],
+                'bug-assigned-to' => [
+                    'field' => 'bug-assigned-to',
+                    'type' => BUG_UPDATE_TYPE_ASSIGN,
+                ],
+                'bug-status' => [
+                    'field' => 'bug-status',
+                    'type' => BUG_UPDATE_TYPE_CHANGE_STATUS,
                 ],
                 'bug-custom-field' => [
                     [
@@ -61,9 +69,9 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
             return;
         }
 
-        $t_issue_readonly = bug_is_readonly( $bug_id );
+        $t_issue_readonly = bug_is_readonly($bug_id);
 
-        $canEdit = !$t_issue_readonly && access_has_bug_level( config_get( 'update_bug_threshold' ), $bug_id );
+        $canEdit = !$t_issue_readonly && access_has_bug_level(config_get('update_bug_threshold'), $bug_id);
 
         if (!$canEdit) {
             return;
@@ -71,8 +79,10 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
 
         $config = $this->config();
 
+        $fields = $this->getFieldValues($bug_id, $config);
+
         $configForJs = [
-            'fields' => $config['inline_edit_components'] ?? [],
+            'fields' => $fields,
             'ajaxUpdatePage' => plugin_page('ajax_update_field.php')
         ];
 
@@ -81,4 +91,42 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
         echo '<link rel="stylesheet" type="text/css" href="' . plugin_file('style.css') . '">
 		<script id="imatic-inline-edit" data-inline-config=\'' . $jsonConfig . '\' type="text/javascript" src="' . plugin_file('index.js') . '"></script>';
     }
+
+    function getFieldValues($bug_id, $config)
+    {
+        $bug = bug_get_row($bug_id, true);
+        $bug_text = bug_text_cache_row( $bug_id );
+        $bug = array_merge($bug, $bug_text);
+
+        $fields = $config['inline_edit_components'];
+
+        foreach ($fields as $key => &$field) {
+
+            switch ($field['field']) {
+
+                case 'description':
+                    $field['value'] = $bug['description'];
+                    break;
+                case 'summary':
+                    $field['value'] = $bug['summary'];
+                    break;
+
+                case 'additional_information':
+                    $field['value'] = $bug['additional_information'];
+                    break;
+
+                case 'bug-custom-field':
+                    $fieldId = $field['field_id'];
+                    $field['value'] = custom_field_get_value($fieldId, $bug_id);
+                    break;
+                case 'bug-status':
+                    $fieldId = $field['status'];
+                    $field['value'] = $bug['status'];
+                    break;
+            }
+        }
+
+        return $fields;
+    }
+
 }

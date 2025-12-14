@@ -7,7 +7,7 @@ module.exports = {
   mode: isProduction ? 'production' : 'development',
   devtool: isProduction ? false : 'source-map',
   entry: {
-    main: './src/index.ts',
+    main: './src/index.tsx',
   },
   output: {
     path: path.resolve(__dirname, './files'),
