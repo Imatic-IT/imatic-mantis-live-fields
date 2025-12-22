@@ -1,25 +1,27 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Field } from "../types/types";
-import { sendAjaxUpdate } from "../utils/ajaxUpdateField";
-import { InlineLoader } from "../components/InlineLoader";
+import React, {useEffect, useRef, useState} from "react";
+import {Field} from "../types/types";
+import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
+import {InlineLoader} from "../components/InlineLoader";
+import { InlineHint } from "../components/InlineHint";
 
 interface CustomAssignProps {
     field: Field;
     tdElement: HTMLElement;
 }
 
-export const CustomAssign: React.FC<CustomAssignProps> = ({ field, tdElement }) => {
+export const CustomAssign: React.FC<CustomAssignProps> = ({field, tdElement}) => {
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [currentValue, setCurrentValue] = useState<string>(tdElement.textContent || "");
+    const [currentValue, setCurrentValue] = useState<string>(tdElement.textContent!);
 
     const wrapperRef = useRef<HTMLDivElement>(null);
     const selectRef = useRef<HTMLSelectElement | null>(null);
 
     const originalValue = useRef<string>(currentValue);
 
-    // init select
     useEffect(() => {
+
+        console.log(tdElement.textContent)
         if (!visible) return;
 
         const original = document.querySelector('select[name="handler_id"]') as HTMLSelectElement | null;
@@ -32,7 +34,6 @@ export const CustomAssign: React.FC<CustomAssignProps> = ({ field, tdElement }) 
         selectRef.current = clone;
         wrapperRef.current?.appendChild(clone);
         clone.focus();
-
         const onChange = async () => {
             setLoading(true);
 
@@ -84,19 +85,26 @@ export const CustomAssign: React.FC<CustomAssignProps> = ({ field, tdElement }) 
     return (
         <>
             {!visible && !loading && (
-                <div
-                    onClick={e => {
-                        if (e.ctrlKey || e.metaKey) setVisible(true);
-                    }}
-                    style={{ cursor: "pointer" }}
-                >
-                    {currentValue || ""}
-                </div>
+                <InlineHint>
+                    <div
+                        onClick={e => {
+                            if (e.ctrlKey || e.metaKey) setVisible(true);
+                        }}
+                        style={{
+                            cursor: "pointer",
+                            width: "100%",
+                            minHeight: "1.4em",
+                            display: "block",
+                        }}
+                    >
+                        {currentValue || "\u00A0"}
+                    </div>
+                </InlineHint>
             )}
 
             {visible && (
-                <div ref={wrapperRef} style={{ position: "relative" }}>
-                    {loading && <InlineLoader />}
+                <div ref={wrapperRef} style={{position: "relative"}}>
+                    {loading && <InlineLoader/>}
                 </div>
             )}
         </>

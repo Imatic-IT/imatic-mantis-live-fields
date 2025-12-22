@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Field } from "../types/types";
-import { sendAjaxUpdate } from "../utils/ajaxUpdateField";
+import React, {useState, useRef, useEffect} from "react";
+import {Field} from "../types/types";
+import {InlineHint} from "../components/InlineHint";
+import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
 
 interface CustomTextProps {
     field: Field;
@@ -21,7 +22,7 @@ function addIssuePrefix(summary: string, prefix: string): string {
     return `${prefix} ${summary}`;
 }
 
-export const CustomText: React.FC<CustomTextProps> = ({ field, tdElement }) => {
+export const CustomText: React.FC<CustomTextProps> = ({field, tdElement}) => {
     const initialValue = tdElement?.textContent?.trim() || "";
     const [visible, setVisible] = useState(false);
     const [currentValue, setCurrentValue] = useState(initialValue);
@@ -47,7 +48,7 @@ export const CustomText: React.FC<CustomTextProps> = ({ field, tdElement }) => {
             let finalValue = valueToSave;
 
             if (field.field === "summary") {
-                const prefix = getIssuePrefix(currentValue); 
+                const prefix = getIssuePrefix(currentValue);
                 finalValue = addIssuePrefix(valueToSave, prefix);
             }
 
@@ -82,32 +83,41 @@ export const CustomText: React.FC<CustomTextProps> = ({ field, tdElement }) => {
     return (
         <>
             {!visible ? (
-                <div style={{ cursor: "pointer" }} onClick={handleClick}>
-                    {currentValue || ""}
-                </div>
+                <InlineHint>
+                    <div
+                        style={{
+                            cursor: "pointer",
+                            width: "100%",
+                            minHeight: "1.4em",
+                            display: "block",
+                        }}
+                        onClick={handleClick}>
+                        {currentValue || "\u00A0"}
+                    </div>
+                </InlineHint>
             ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <div style={{display: "flex", flexDirection: "column", gap: "4px"}}>
                     <input
                         type="text"
                         ref={inputRef}
                         value={editingValue}
                         onChange={(e) => setEditingValue(e.target.value)}
-                        style={{ width: "100%" }}
+                        style={{width: "100%"}}
                     />
-                    <div style={{ display: "flex", gap: "4px" }}>
+                    <div style={{display: "flex", gap: "4px"}}>
                         <button
                             className="btn btn-xs btn-success rounded"
                             title="Uložiť"
                             onClick={handleSave}
                         >
-                            <i className="fa fa-check" />
+                            <i className="fa fa-check"/>
                         </button>
                         <button
                             className="btn btn-xs btn-secondary rounded"
                             title="Zrušiť"
                             onClick={handleCancel}
                         >
-                            <i className="fa fa-times" />
+                            <i className="fa fa-times"/>
                         </button>
                     </div>
                 </div>

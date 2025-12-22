@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {useState, useEffect, useRef} from "react";
 import flatpickr from "flatpickr";
+import {Field} from "../types/types";
 import "flatpickr/dist/flatpickr.min.css";
-import { Czech } from "flatpickr/dist/l10n/cs.js";
-import { Field } from "../types/types";
-import { Actions } from "../components/Actions";
-import { sendAjaxUpdate } from "../utils/ajaxUpdateField";
+import {Actions} from "../components/Actions";
+import {Czech} from "flatpickr/dist/l10n/cs.js";
+import {InlineHint} from "../components/InlineHint";
+import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
 
 interface CustomDateProps {
     field: Field;
     tdElement: HTMLElement;
 }
 
-export const CustomDate: React.FC<CustomDateProps> = ({ field, tdElement }) => {
-    const initialValue = tdElement.textContent?.trim() || "–";
+export const CustomDate: React.FC<CustomDateProps> = ({field, tdElement}) => {
+    const initialValue = tdElement.textContent?.trim() ;
 
     const [currentValue, setCurrentValue] = useState(initialValue);
     const [editingValue, setEditingValue] = useState(initialValue);
@@ -29,7 +30,6 @@ export const CustomDate: React.FC<CustomDateProps> = ({ field, tdElement }) => {
             fpRef.current = null;
         }
 
-        field;
         fpRef.current = flatpickr(inputRef.current, {
             enableTime: true,
             dateFormat: "Y-m-d H:i",
@@ -80,29 +80,36 @@ export const CustomDate: React.FC<CustomDateProps> = ({ field, tdElement }) => {
     return (
         <>
             {!visible ? (
-                <div
-                    onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                        if (e.ctrlKey || e.metaKey) {
-                            setVisible(true);
-                        }
-                    }}
-                    style={{ cursor: "pointer" }}
-                >
-                    {currentValue}
-                </div>
-
+                <InlineHint>
+                    <div
+                        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                            if (e.ctrlKey || e.metaKey) {
+                                setVisible(true);
+                            }
+                        }}
+                        style={{
+                            cursor: "pointer",
+                            width: "100%",
+                            minHeight: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        {currentValue || "\u00A0"}
+                    </div>
+                </InlineHint>
             ) : (
-                <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <div style={{display: "flex", alignItems: "center", gap: "4px"}}>
                     <input
                         ref={inputRef}
                         type="text"
                         className="datetimepicker input-sm"
                         value={editingValue}
                         onChange={(e) => setEditingValue(e.target.value)}
-                        style={{ fontSize: "1rem", width: "160px", padding: "0.25rem 0.5rem" }}
+                        style={{fontSize: "1rem", width: "160px", padding: "0.25rem 0.5rem"}}
                         autoFocus
                     />
-                    <Actions onSave={handleSave} onCancel={handleCancel} />
+                    <Actions onSave={handleSave} onCancel={handleCancel}/>
                 </div>
             )}
         </>

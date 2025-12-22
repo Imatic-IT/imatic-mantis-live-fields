@@ -1,18 +1,19 @@
-import { Field } from "../types/types";
-import { Actions } from "../components/Actions";
+import {Field} from "../types/types";
+import {Actions} from "../components/Actions";
 import "@toast-ui/editor/dist/toastui-editor.css";
-import { getUsersForMention } from "../utils/utils";
-import { Editor, Viewer } from "@toast-ui/react-editor";
-import { sendAjaxUpdate } from "../utils/ajaxUpdateField";
-import React, { useState, useRef, useEffect } from "react";
-import { MentionsToolbar } from "../components/MentionsToolbar";
+import {getUsersForMention} from "../utils/utils";
+import {InlineHint} from "../components/InlineHint";
+import {Editor, Viewer} from "@toast-ui/react-editor";
+import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
+import React, {useState, useRef, useEffect} from "react";
+import {MentionsToolbar} from "../components/MentionsToolbar";
 
 interface CustomTextareaProps {
     field: Field;
 }
 
-export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field }) => {
-    const [currentValue, setCurrentValue] = useState(field.value || "");
+export const CustomTextarea: React.FC<CustomTextareaProps> = ({field}) => {
+    const [currentValue, setCurrentValue] = useState(field.value || "\u00A0");
     const [editingValue, setEditingValue] = useState(currentValue);
     const [visible, setVisible] = useState(false);
     const [mentionUsers, setMentionUsers] = useState<{ key: string; value: string }[]>([]);
@@ -52,16 +53,23 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field }) => {
     return (
         <>
             {!visible ? (
-                <div
-                    style={{ cursor: "pointer" }}
-                    onClick={(e) => {
-                        if (e.ctrlKey || e.metaKey) setVisible(true);
-                    }}
-                >
-                    <Viewer initialValue={currentValue} />
-                </div>
+                <InlineHint>
+                    <div
+                        style={{
+                            cursor: "pointer",
+                            width: "100%",
+                            minHeight: "1.4em",
+                            display: "block",
+                        }}
+                        onClick={(e) => {
+                            if (e.ctrlKey || e.metaKey) setVisible(true);
+                        }}
+                    >
+                        <Viewer initialValue={currentValue}/>
+                    </div>
+                </InlineHint>
             ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <div style={{display: "flex", flexDirection: "column", gap: "6px"}}>
                     <Editor
                         ref={editorRef}
                         initialValue={editingValue}
@@ -82,7 +90,7 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field }) => {
                         }}
                     />
 
-                    <Actions onSave={handleSave} onCancel={handleCancel} />
+                    <Actions onSave={handleSave} onCancel={handleCancel}/>
                 </div>
             )}
         </>

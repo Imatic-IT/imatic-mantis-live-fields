@@ -1,18 +1,19 @@
-import { Field } from "../types/types";
-import { Editor } from "@toast-ui/react-editor";
+import {Field} from "../types/types";
+import {Editor} from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
-import { InlineLoader } from "../components/InlineLoader";
-import { sendAjaxUpdate } from "../utils/ajaxUpdateField";
-import React, { useState, useEffect, useRef } from "react";
-import { MentionsToolbar } from "../components/MentionsToolbar";
-import { getSelectOptionsNew, cloneCheckboxLabel, getUsersForMention } from "../utils/utils";
+import {InlineHint} from "../components/InlineHint";
+import {InlineLoader} from "../components/InlineLoader";
+import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
+import React, {useState, useEffect, useRef} from "react";
+import {MentionsToolbar} from "../components/MentionsToolbar";
+import {getSelectOptionsNew, cloneCheckboxLabel, getUsersForMention} from "../utils/utils";
 
 interface CustomChangeStatusProps {
     field: Field;
     tdElement: HTMLElement;
 }
 
-export const CustomChangeStatus: React.FC<CustomChangeStatusProps> = ({ field, tdElement }) => {
+export const CustomChangeStatus: React.FC<CustomChangeStatusProps> = ({field, tdElement}) => {
     const initialValue = field.value ?? "";
     const [visible, setVisible] = useState(false);
     const [currentValue, setCurrentValue] = useState(tdElement.textContent);
@@ -101,31 +102,37 @@ export const CustomChangeStatus: React.FC<CustomChangeStatusProps> = ({ field, t
         <>
             {/* VIEW stav */}
             {!visible && !loading && (
-                <div
-                    onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                        if (e.ctrlKey || e.metaKey) {
-                            setVisible(true);
-                        }
-                    }}
-                    style={{ cursor: "pointer" }}
-                    ref={divRef}
-                >
-                    <i className={`mx-3 fa fa-square fa-status-box status-${selectedStatus}-fg`} />
-                    {currentValue}
-                </div>
+                <InlineHint>
+                    <div
+                        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                            if (e.ctrlKey || e.metaKey) {
+                                setVisible(true);
+                            }
+                        }}
+                        style={{
+                            cursor: "pointer",
+                            width: "100%",
+                            minHeight: "1.4em",
+                            display: "block",
+                        }}
+                        ref={divRef}
+                    >
+                        <i className={`mx-3 fa fa-square fa-status-box status-${selectedStatus}-fg`}/>
+                        {currentValue || "\u00A0"}
+                    </div>
+                </InlineHint>
             )}
 
             {/* LOADING stav */}
             {!visible && loading && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <InlineLoader />
+                <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+                    <InlineLoader/>
                 </div>
             )}
 
             {/* EDIT stav */}
             {visible && (
-                <div style={{ width: 900 }}>
-                    {/* Riadok: select + checkbox */}
+                <div style={{width: 900}}>
                     <div
                         style={{
                             display: 'flex',
