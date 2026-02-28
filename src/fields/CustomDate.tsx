@@ -36,11 +36,14 @@ export const CustomDate: React.FC<CustomDateProps> = ({field, tdElement}) => {
             time_24hr: true,
             locale: Czech,
             defaultDate: editingValue !== "–" ? editingValue : undefined,
+            allowInput: true,
             onChange: (selectedDates) => {
                 if (selectedDates.length > 0) {
                     const d = selectedDates[0];
                     const formatted = d.toISOString().slice(0, 16).replace("T", " ");
                     setEditingValue(formatted);
+                } else {
+                    setEditingValue("");
                 }
             },
         });
@@ -64,7 +67,7 @@ export const CustomDate: React.FC<CustomDateProps> = ({field, tdElement}) => {
         });
 
         if (response.success) {
-            setCurrentValue(editingValue || "–");
+            setCurrentValue(editingValue || "");
             setVisible(false);
         } else {
             alert(`Chyba pri ukladaní: ${response.message}`);

@@ -39,7 +39,6 @@ export const MentionsToolbar: React.FC<MentionToolbarProps> = ({ users, onInsert
                         fontSize: 12
                     }}
                 >
-                    <i className="fa fa-plus" style={{ marginRight: 4 }} />
                     {user.value}
                 </div>
             ))}

@@ -42,6 +42,10 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
                     'field' => 'bug-status',
                     'type' => BUG_UPDATE_TYPE_CHANGE_STATUS,
                 ],
+                'bug-priority' => [
+                    'field' => 'priority',
+                    'type' => 'select',
+                ],
                 'bug-custom-field' => [
                     [
                         'field_id' => 2, // PROD id 2 dev 8
@@ -83,13 +87,23 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
 
         $configForJs = [
             'fields' => $fields,
-            'ajaxUpdatePage' => plugin_page('ajax_update_field.php')
+            'ajaxUpdatePage' => plugin_page('ajax_update_field.php'),
+            'priorities' => $this->getPriorities(),
         ];
 
         $jsonConfig = json_encode($configForJs, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 
         echo '<link rel="stylesheet" type="text/css" href="' . plugin_file('style.css') . '">
 		<script id="imatic-inline-edit" data-inline-config=\'' . $jsonConfig . '\' type="text/javascript" src="' . plugin_file('index.js') . '"></script>';
+    }
+
+    private function getPriorities(){
+        $priorities = MantisEnum::getAssocArrayIndexedByValues(config_get('priority_enum_string'));
+
+        foreach ($priorities as $key => $priority) {
+            $priorities[$key] =  get_enum_element('priority', $key );
+        }
+        return $priorities;
     }
 
     function getFieldValues($bug_id, $config)
@@ -103,18 +117,15 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
         foreach ($fields as $key => &$field) {
 
             switch ($field['field']) {
-
                 case 'description':
                     $field['value'] = $bug['description'];
                     break;
                 case 'summary':
                     $field['value'] = $bug['summary'];
                     break;
-
                 case 'additional_information':
                     $field['value'] = $bug['additional_information'];
                     break;
-
                 case 'bug-custom-field':
                     $fieldId = $field['field_id'];
                     $field['value'] = custom_field_get_value($fieldId, $bug_id);

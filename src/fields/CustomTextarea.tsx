@@ -3,16 +3,18 @@ import {Actions} from "../components/Actions";
 import "@toast-ui/editor/dist/toastui-editor.css";
 import {getUsersForMention} from "../utils/utils";
 import {InlineHint} from "../components/InlineHint";
-import {Editor, Viewer} from "@toast-ui/react-editor";
+import {Editor} from "@toast-ui/react-editor";
+import { Viewer} from "@toast-ui/react-editor";
 import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
 import React, {useState, useRef, useEffect} from "react";
 import {MentionsToolbar} from "../components/MentionsToolbar";
 
 interface CustomTextareaProps {
     field: Field;
+    tdElement: HTMLElement;
 }
 
-export const CustomTextarea: React.FC<CustomTextareaProps> = ({field}) => {
+export const CustomTextarea: React.FC<CustomTextareaProps> = ({field, tdElement}) => {
     const [currentValue, setCurrentValue] = useState(field.value || "\u00A0");
     const [editingValue, setEditingValue] = useState(currentValue);
     const [visible, setVisible] = useState(false);
@@ -49,6 +51,19 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({field}) => {
         if (!visible) return;
         setMentionUsers(getUsersForMention());
     }, [visible]);
+
+    // FOR PLUGIN ImatiForm (init html from json )
+    useEffect(() => {
+        (window as any).imaticFormsRender?.();
+    }, []);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (e.ctrlKey || e.metaKey) setVisible(true);
+        };
+        tdElement.addEventListener("click", handler);
+        return () => tdElement.removeEventListener("click", handler);
+    }, [tdElement]);
 
     return (
         <>
