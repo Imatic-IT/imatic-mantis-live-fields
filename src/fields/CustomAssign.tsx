@@ -21,7 +21,6 @@ export const CustomAssign: React.FC<CustomAssignProps> = ({field, tdElement}) =>
 
     useEffect(() => {
 
-        console.log(tdElement.textContent)
         if (!visible) return;
 
         const original = document.querySelector('select[name="handler_id"]') as HTMLSelectElement | null;
