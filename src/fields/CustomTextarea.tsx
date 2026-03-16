@@ -1,22 +1,22 @@
-import {Field} from "../types/types";
-import {Actions} from "../components/Actions";
+import { Field } from "../types/types";
+import { Actions } from "../components/Actions";
+import { Editor, Viewer } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
-import {getUsersForMention} from "../utils/utils";
-import {InlineHint} from "../components/InlineHint";
-import {Editor} from "@toast-ui/react-editor";
-import { Viewer} from "@toast-ui/react-editor";
-import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
-import React, {useState, useRef, useEffect} from "react";
-import {MentionsToolbar} from "../components/MentionsToolbar";
+import { InlineHint } from "../components/InlineHint";
+import { sendAjaxUpdate } from "../utils/ajaxUpdateField";
+import React, { useState, useRef, useEffect } from "react";
+import { MentionsToolbar } from "../components/MentionsToolbar";
+import { getUsersForMention, autoLinkMarkdown } from "../utils/utils";
 
 interface CustomTextareaProps {
     field: Field;
     tdElement: HTMLElement;
 }
 
-export const CustomTextarea: React.FC<CustomTextareaProps> = ({field, tdElement}) => {
-    const [currentValue, setCurrentValue] = useState(field.value || "\u00A0");
-    const [editingValue, setEditingValue] = useState(currentValue);
+export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field, tdElement }) => {
+    const [storedValue, setStoredValue] = useState(field.value || "\u00A0");
+    const [displayValue, setDisplayValue] = useState(autoLinkMarkdown(storedValue));
+    const [editingValue, setEditingValue] = useState(storedValue);
     const [visible, setVisible] = useState(false);
     const [mentionUsers, setMentionUsers] = useState<{ key: string; value: string }[]>([]);
 
@@ -24,6 +24,7 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({field, tdElement}
 
     const handleSave = async () => {
         const newValue = editorRef.current?.getInstance().getMarkdown() ?? "";
+
         const response = await sendAjaxUpdate((formData) => {
             formData.append("value", newValue);
             formData.append("field", field.field);
@@ -34,7 +35,8 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({field, tdElement}
         });
 
         if (response.success) {
-            setCurrentValue(newValue);
+            setStoredValue(newValue);
+            setDisplayValue(autoLinkMarkdown(newValue));
             setEditingValue(newValue);
             setVisible(false);
         } else {
@@ -43,7 +45,7 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({field, tdElement}
     };
 
     const handleCancel = () => {
-        setEditingValue(currentValue);
+        setEditingValue(storedValue);
         setVisible(false);
     };
 
@@ -52,7 +54,6 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({field, tdElement}
         setMentionUsers(getUsersForMention());
     }, [visible]);
 
-    // FOR PLUGIN ImatiForm (init html from json )
     useEffect(() => {
         (window as any).imaticFormsRender?.();
     }, []);
@@ -80,11 +81,11 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({field, tdElement}
                             if (e.ctrlKey || e.metaKey) setVisible(true);
                         }}
                     >
-                        <Viewer initialValue={currentValue}/>
+                        <Viewer initialValue={displayValue} />
                     </div>
                 </InlineHint>
             ) : (
-                <div style={{display: "flex", flexDirection: "column", gap: "6px"}}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                     <Editor
                         ref={editorRef}
                         initialValue={editingValue}
@@ -105,7 +106,7 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({field, tdElement}
                         }}
                     />
 
-                    <Actions onSave={handleSave} onCancel={handleCancel}/>
+                    <Actions onSave={handleSave} onCancel={handleCancel} />
                 </div>
             )}
         </>

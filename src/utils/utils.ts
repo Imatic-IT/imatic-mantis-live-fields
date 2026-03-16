@@ -70,3 +70,8 @@ export const getUsersForMention = () => {
             .filter(u => !blocked.includes(u.key))
     );
 };
+
+export function autoLinkMarkdown(text: string): string {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, "[$1]($1)");
+}
