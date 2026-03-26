@@ -48,6 +48,8 @@ export const CustomDate: React.FC<CustomDateProps> = ({field, tdElement}) => {
             },
         });
 
+        fpRef.current.open();
+
         return () => {
             if (fpRef.current) {
                 fpRef.current.destroy();
@@ -79,6 +81,11 @@ export const CustomDate: React.FC<CustomDateProps> = ({field, tdElement}) => {
         setEditingValue(currentValue);
         setVisible(false);
     };
+
+    const handleClear = () => {
+        setEditingValue('');
+    };
+
 
     return (
         <>
@@ -112,7 +119,7 @@ export const CustomDate: React.FC<CustomDateProps> = ({field, tdElement}) => {
                         style={{fontSize: "1rem", width: "160px", padding: "0.25rem 0.5rem"}}
                         autoFocus
                     />
-                    <Actions onSave={handleSave} onCancel={handleCancel}/>
+                    <Actions onSave={handleSave} onCancel={handleCancel} onClear={handleClear}/>
                 </div>
             )}
         </>

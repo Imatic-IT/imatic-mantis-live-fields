@@ -4,7 +4,7 @@ import { Editor, Viewer } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
 import { InlineHint } from "../components/InlineHint";
 import { sendAjaxUpdate } from "../utils/ajaxUpdateField";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { MentionsToolbar } from "../components/MentionsToolbar";
 import { getUsersForMention, autoLinkMarkdown } from "../utils/utils";
 
@@ -13,9 +13,22 @@ interface CustomTextareaProps {
     tdElement: HTMLElement;
 }
 
+const isHtmlEmail = (text: string): boolean => {
+    return /<html[\s>]/i.test(text) || /<body[\s>]/i.test(text) || /<head[\s>]/i.test(text);
+};
+
 export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field, tdElement }) => {
     const [storedValue, setStoredValue] = useState(field.value || "\u00A0");
     const [displayValue, setDisplayValue] = useState(autoLinkMarkdown(storedValue));
+
+    const htmlEmailParts = useMemo(() => {
+        if (!isHtmlEmail(storedValue)) return null;
+        const match = storedValue.match(/([\s\S]*?)(<html[\s\S]*)/i);
+        return {
+            prefix: match ? match[1].trim() : '',
+            html: match ? match[2] : storedValue,
+        };
+    }, [storedValue]);
     const [editingValue, setEditingValue] = useState(storedValue);
     const [visible, setVisible] = useState(false);
     const [mentionUsers, setMentionUsers] = useState<{ key: string; value: string }[]>([]);
@@ -81,7 +94,19 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field, tdElement
                             if (e.ctrlKey || e.metaKey) setVisible(true);
                         }}
                     >
-                        <Viewer initialValue={displayValue} />
+                        {htmlEmailParts ? (
+                            <>
+                                {htmlEmailParts.prefix && <Viewer initialValue={htmlEmailParts.prefix} />}
+                                <iframe
+                                    srcDoc={htmlEmailParts.html}
+                                    style={{ width: "100%", minHeight: "500px", border: "1px solid #ccc", borderRadius: "4px", display: "block" }}
+                                    sandbox="allow-same-origin"
+                                    loading="lazy"
+                                />
+                            </>
+                        ) : (
+                            <Viewer initialValue={displayValue} />
+                        )}
                     </div>
                 </InlineHint>
             ) : (

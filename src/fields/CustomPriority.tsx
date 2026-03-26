@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {Field} from "../types/types";
 import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
 import {InlineLoader} from "../components/InlineLoader";
@@ -20,6 +20,11 @@ export const CustomPriority: React.FC<CustomPriorityProps> = ({field, tdElement}
     const selectRef = useRef<HTMLSelectElement | null>(null);
 
     const originalValue = useRef<string>(currentValue);
+
+    useLayoutEffect(() => {
+        if (!visible) return;
+        (selectRef.current as any)?.showPicker?.();
+    }, [visible]);
 
     useEffect(() => {
         if (!visible) return;
@@ -66,6 +71,7 @@ export const CustomPriority: React.FC<CustomPriorityProps> = ({field, tdElement}
                         {currentValue || "\u00A0"}
                     </div>
                 </InlineHint>
+
             )}
 
             {visible && (

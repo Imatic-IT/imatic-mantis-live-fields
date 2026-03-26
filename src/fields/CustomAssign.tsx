@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {Field} from "../types/types";
 import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
 import {InlineLoader} from "../components/InlineLoader";
@@ -19,7 +19,7 @@ export const CustomAssign: React.FC<CustomAssignProps> = ({field, tdElement}) =>
 
     const originalValue = useRef<string>(currentValue);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
 
         if (!visible) return;
 
@@ -33,6 +33,7 @@ export const CustomAssign: React.FC<CustomAssignProps> = ({field, tdElement}) =>
         selectRef.current = clone;
         wrapperRef.current?.appendChild(clone);
         clone.focus();
+        (clone as any).showPicker?.();
         const onChange = async () => {
             setLoading(true);
 

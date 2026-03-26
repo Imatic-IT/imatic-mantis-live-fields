@@ -4,7 +4,7 @@ import "@toast-ui/editor/dist/toastui-editor.css";
 import {InlineHint} from "../components/InlineHint";
 import {InlineLoader} from "../components/InlineLoader";
 import {sendAjaxUpdate} from "../utils/ajaxUpdateField";
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect, useLayoutEffect, useRef} from "react";
 import {MentionsToolbar} from "../components/MentionsToolbar";
 import {getSelectOptionsNew, cloneCheckboxLabel, getUsersForMention} from "../utils/utils";
 
@@ -29,6 +29,7 @@ export const CustomChangeStatus: React.FC<CustomChangeStatusProps> = ({field, td
 
     const privateNoteLabelRef = useRef<HTMLLabelElement | null>(null);
     const tdRef = useRef<HTMLTableCellElement>(tdElement as HTMLTableCellElement);
+    const statusSelectRef = useRef<HTMLSelectElement | null>(null);
 
     useEffect(() => {
         const opts = getSelectOptionsNew("new_status");
@@ -44,6 +45,11 @@ export const CustomChangeStatus: React.FC<CustomChangeStatusProps> = ({field, td
 
     }, []);
 
+
+    useLayoutEffect(() => {
+        if (!visible) return;
+        (statusSelectRef.current as any)?.showPicker?.();
+    }, [visible]);
 
     useEffect(() => {
         if (!visible) return;
@@ -142,6 +148,7 @@ export const CustomChangeStatus: React.FC<CustomChangeStatusProps> = ({field, td
                         }}
                     >
                         <select
+                            ref={statusSelectRef}
                             value={selectedStatus}
                             onChange={async (e) => {
                                 const value = (e.target as HTMLSelectElement).value;

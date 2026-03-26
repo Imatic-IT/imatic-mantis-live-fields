@@ -3,13 +3,26 @@ import React from 'react';
 interface ActionsProps {
     onSave: () => void;
     onCancel: () => void;
+    onClear?: () => void;
 }
 
-export const Actions: React.FC<ActionsProps> = ({onSave, onCancel}) => {
+export const Actions: React.FC<ActionsProps> = ({ onSave, onCancel, onClear }) => {
     return (
-        <div style={{marginTop: 4}}>
+        <div style={{ marginTop: 4 }}>
+
+            {onClear && (
+                <button
+                    style={{ marginRight: 4 }}
+                    className="inline-save btn btn-xs btn-warning rounded"
+                    title="Vyčistiť"
+                    onClick={onClear}
+                >
+                    <i className="fa fa-refresh"></i>
+                </button>
+            )}
+
             <button
-                style={{marginRight: 4}}
+                style={{ marginRight: 4 }}
                 className="inline-save btn btn-xs btn-success rounded"
                 title="Uložiť"
                 onClick={onSave}
@@ -24,6 +37,7 @@ export const Actions: React.FC<ActionsProps> = ({onSave, onCancel}) => {
             >
                 <i className="fa fa-times"></i>
             </button>
+
         </div>
-    )
+    );
 };
