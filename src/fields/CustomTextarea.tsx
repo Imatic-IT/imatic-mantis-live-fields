@@ -7,6 +7,17 @@ import { sendAjaxUpdate } from "../utils/ajaxUpdateField";
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { MentionsToolbar } from "../components/MentionsToolbar";
 import { getUsersForMention, autoLinkMarkdown } from "../utils/utils";
+import DOMPurify from "dompurify";
+
+// toast-ui's built-in sanitizer drops links with non-standard protocols
+// (e.g. thunderlink://), which bugnotes — rendered by ImaticFormatting — keep.
+// Extend DOMPurify's default protocol allowlist with thunderlink so those
+// links survive in the description Viewer too.
+const ALLOWED_URI_REGEXP =
+    /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|thunderlink):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i;
+
+const sanitizeWithThunderlink = (html: string): string =>
+    DOMPurify.sanitize(html, { ALLOWED_URI_REGEXP }) as string;
 
 interface CustomTextareaProps {
     field: Field;
@@ -16,6 +27,11 @@ interface CustomTextareaProps {
 const isHtmlEmail = (text: string): boolean => {
     return /<html[\s>]/i.test(text) || /<body[\s>]/i.test(text) || /<head[\s>]/i.test(text);
 };
+
+// Keep live-edit active everywhere except on links: a ctrl/cmd+click on an
+// anchor must open the link (the browser's default), not switch to edit mode.
+const isLinkClick = (target: EventTarget | null): boolean =>
+    target instanceof Element && target.closest("a") !== null;
 
 export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field, tdElement }) => {
     const [storedValue, setStoredValue] = useState(field.value || "\u00A0");
@@ -73,6 +89,7 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field, tdElement
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
+            if (isLinkClick(e.target)) return;
             if (e.ctrlKey || e.metaKey) setVisible(true);
         };
         tdElement.addEventListener("click", handler);
@@ -91,12 +108,13 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field, tdElement
                             display: "block",
                         }}
                         onClick={(e) => {
+                            if (isLinkClick(e.target)) return;
                             if (e.ctrlKey || e.metaKey) setVisible(true);
                         }}
                     >
                         {htmlEmailParts ? (
                             <>
-                                {htmlEmailParts.prefix && <Viewer initialValue={htmlEmailParts.prefix} />}
+                                {htmlEmailParts.prefix && <Viewer initialValue={htmlEmailParts.prefix} customHTMLSanitizer={sanitizeWithThunderlink} />}
                                 <iframe
                                     srcDoc={htmlEmailParts.html}
                                     style={{ width: "100%", minHeight: "500px", border: "1px solid #ccc", borderRadius: "4px", display: "block" }}
@@ -105,7 +123,7 @@ export const CustomTextarea: React.FC<CustomTextareaProps> = ({ field, tdElement
                                 />
                             </>
                         ) : (
-                            <Viewer initialValue={displayValue} />
+                            <Viewer initialValue={displayValue} customHTMLSanitizer={sanitizeWithThunderlink} />
                         )}
                     </div>
                 </InlineHint>

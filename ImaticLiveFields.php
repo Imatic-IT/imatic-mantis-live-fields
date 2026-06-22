@@ -93,8 +93,23 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
 
         $jsonConfig = json_encode($configForJs, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 
-        echo '<link rel="stylesheet" type="text/css" href="' . plugin_file('style.css') . '">
-		<script id="imatic-inline-edit" data-inline-config=\'' . $jsonConfig . '\' type="text/javascript" src="' . plugin_file('index.js') . '"></script>';
+        echo '<link rel="stylesheet" type="text/css" href="' . $this->assetUrl('style.css') . '">
+		<script id="imatic-inline-edit" data-inline-config=\'' . $jsonConfig . '\' type="text/javascript" src="' . $this->assetUrl('index.js') . '"></script>';
+    }
+
+    /**
+     * Build a plugin asset URL with a cache-busting version based on the file's
+     * modification time, so a new build is picked up immediately instead of
+     * being served from the browser cache for the plugin_file max-age window.
+     */
+    private function assetUrl(string $file): string
+    {
+        $url = plugin_file($file);
+        $path = plugin_file_path($file, plugin_get_current());
+        $version = $path !== false ? filemtime($path) : $this->version;
+        $separator = strpos($url, '?') !== false ? '&' : '?';
+
+        return $url . $separator . 'v=' . $version;
     }
 
     private function getPriorities(){
