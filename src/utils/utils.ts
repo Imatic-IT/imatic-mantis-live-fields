@@ -72,6 +72,13 @@ export const getUsersForMention = () => {
 };
 
 export function autoLinkMarkdown(text: string): string {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, "[$1]($1)");
+    // Match already-formatted markdown links [text](url) first and leave them
+    // untouched; only wrap bare URLs that are not already part of a link.
+    return text.replace(
+        /\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s]+)/g,
+        (match, _linkText, _linkUrl, bareUrl) => {
+            if (bareUrl) return `[${bareUrl}](${bareUrl})`;
+            return match;
+        }
+    );
 }
