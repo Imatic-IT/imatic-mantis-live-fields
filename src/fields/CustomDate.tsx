@@ -13,7 +13,10 @@ interface CustomDateProps {
 }
 
 export const CustomDate: React.FC<CustomDateProps> = ({field, tdElement}) => {
-    const initialValue = tdElement.textContent?.trim() ;
+    // Prefer the value supplied by PHP: once the picker is lazy-loaded, the
+    // Suspense fallback has already cleared the cell, so tdElement.textContent
+    // would be empty by the time this component mounts.
+    const initialValue = field.value ?? tdElement.textContent?.trim() ?? "";
 
     const [currentValue, setCurrentValue] = useState(initialValue);
     const [editingValue, setEditingValue] = useState(initialValue);

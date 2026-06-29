@@ -12,6 +12,11 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './files'),
     filename: 'index.js',
+    // Lazily-loaded chunks. The public path is set at runtime in src/index.tsx
+    // so these resolve through Mantis' plugin_file.php router; keep the filename
+    // within the characters plugin_file.php allows ([A-Za-z0-9_.-]).
+    chunkFilename: '[name].[contenthash].chunk.js',
+    publicPath: '',
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],

@@ -42,9 +42,43 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
                     'field' => 'bug-status',
                     'type' => BUG_UPDATE_TYPE_CHANGE_STATUS,
                 ],
+                // Enum select fields — options are built from the matching
+                // Mantis enum string (see getEnumOptions()).
                 'bug-priority' => [
                     'field' => 'priority',
                     'type' => 'select',
+                    'enum' => 'priority',
+                ],
+                'bug-severity' => [
+                    'field' => 'severity',
+                    'type' => 'select',
+                    'enum' => 'severity',
+                ],
+                'bug-reproducibility' => [
+                    'field' => 'reproducibility',
+                    'type' => 'select',
+                    'enum' => 'reproducibility',
+                ],
+                'bug-view-status' => [
+                    'field' => 'view_state',
+                    'type' => 'select',
+                    'enum' => 'view_state',
+                ],
+                'bug-projection' => [
+                    'field' => 'projection',
+                    'type' => 'select',
+                    'enum' => 'projection',
+                ],
+                'bug-eta' => [
+                    'field' => 'eta',
+                    'type' => 'select',
+                    'enum' => 'eta',
+                ],
+                // Category — options come from the project's category list.
+                'bug-category' => [
+                    'field' => 'category_id',
+                    'type' => 'select',
+                    'source' => 'category',
                 ],
                 'bug-custom-field' => [
                     [
@@ -88,7 +122,6 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
         $configForJs = [
             'fields' => $fields,
             'ajaxUpdatePage' => plugin_page('ajax_update_field.php'),
-            'priorities' => $this->getPriorities(),
         ];
 
         $jsonConfig = json_encode($configForJs, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
@@ -112,13 +145,38 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
         return $url . $separator . 'v=' . $version;
     }
 
-    private function getPriorities(){
-        $priorities = MantisEnum::getAssocArrayIndexedByValues(config_get('priority_enum_string'));
+    /**
+     * Build the option list ({value, label}) for a Mantis enum field
+     * (priority, severity, reproducibility, view_state, projection, eta, ...).
+     */
+    private function getEnumOptions(string $enumName): array
+    {
+        $assoc = MantisEnum::getAssocArrayIndexedByValues(config_get($enumName . '_enum_string'));
 
-        foreach ($priorities as $key => $priority) {
-            $priorities[$key] =  get_enum_element('priority', $key );
+        $options = [];
+        foreach ($assoc as $value => $label) {
+            $options[] = [
+                'value' => (string)$value,
+                'label' => get_enum_element($enumName, $value),
+            ];
         }
-        return $priorities;
+        return $options;
+    }
+
+    /**
+     * Build the option list ({value, label}) for the category field of a
+     * project, including inherited categories.
+     */
+    private function getCategoryOptions(int $projectId): array
+    {
+        $options = [];
+        foreach (category_get_all_rows($projectId) as $row) {
+            $options[] = [
+                'value' => (string)$row['id'],
+                'label' => $row['name'],
+            ];
+        }
+        return $options;
     }
 
     function getFieldValues($bug_id, $config)
@@ -131,7 +189,54 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
 
         foreach ($fields as $key => &$field) {
 
-            switch ($field['field']) {
+            // Custom fields are configured as a list of field definitions; the
+            // value is loaded per field id (date values are formatted to match
+            // the inline flatpickr format).
+            if ($key === 'bug-custom-field') {
+                foreach ($field as &$customField) {
+                    $rawValue = isset($customField['field_id'])
+                        ? custom_field_get_value($customField['field_id'], $bug_id)
+                        : false;
+
+                    if (($customField['type'] ?? null) === 'date') {
+                        $customField['value'] = ($rawValue && !date_is_null((int)$rawValue))
+                            ? date('Y-m-d H:i', (int)$rawValue)
+                            : '';
+                    } else {
+                        $customField['value'] = $rawValue !== false ? (string)$rawValue : '';
+                    }
+                }
+                unset($customField);
+                continue;
+            }
+
+            // Enum select fields — attach options + the current value.
+            if (isset($field['enum'])) {
+                $field['options'] = $this->getEnumOptions($field['enum']);
+                $field['value'] = isset($bug[$field['field']]) ? (string)$bug[$field['field']] : '';
+                continue;
+            }
+
+            // Category select — options from the project category list.
+            if (($field['source'] ?? null) === 'category') {
+                $field['options'] = $this->getCategoryOptions((int)$bug['project_id']);
+                $field['value'] = (string)$bug['category_id'];
+                continue;
+            }
+
+            switch ($field['field'] ?? null) {
+                case 'due_date':
+                    // Formatted to match the inline flatpickr format (Y-m-d H:i).
+                    $field['value'] = !date_is_null($bug['due_date'])
+                        ? date('Y-m-d H:i', $bug['due_date'])
+                        : '';
+                    break;
+                case 'bug-status':
+                    // The status cell is rendered by React from these values;
+                    // 'value' drives the status colour class, 'label' the text.
+                    $field['value'] = (string)$bug['status'];
+                    $field['label'] = get_enum_element('status', (int)$bug['status']);
+                    break;
                 case 'description':
                     $field['value'] = $bug['description'];
                     break;
@@ -141,16 +246,9 @@ class ImaticLiveFieldsPlugin extends MantisPlugin
                 case 'additional_information':
                     $field['value'] = $bug['additional_information'];
                     break;
-                case 'bug-custom-field':
-                    $fieldId = $field['field_id'];
-                    $field['value'] = custom_field_get_value($fieldId, $bug_id);
-                    break;
-                case 'bug-status':
-                    $fieldId = $field['status'];
-                    $field['value'] = $bug['status'];
-                    break;
             }
         }
+        unset($field);
 
         return $fields;
     }

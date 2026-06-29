@@ -16,7 +16,10 @@ interface CustomChangeStatusProps {
 export const CustomChangeStatus: React.FC<CustomChangeStatusProps> = ({field, tdElement}) => {
     const initialValue = field.value ?? "";
     const [visible, setVisible] = useState(false);
-    const [currentValue, setCurrentValue] = useState(tdElement.textContent);
+    // Use the label supplied by PHP, not tdElement.textContent: once the editor
+    // is lazy-loaded, the Suspense fallback has already cleared the cell's
+    // original content, so textContent would be empty by the time we mount.
+    const [currentValue, setCurrentValue] = useState(field.label ?? tdElement.textContent);
 
     const [selectedStatus, setSelectedStatus] = useState(initialValue);
     const [statusOptions, setStatusOptions] = useState<{ value: string; label: string }[]>([]);
@@ -124,6 +127,7 @@ export const CustomChangeStatus: React.FC<CustomChangeStatusProps> = ({field, td
                         ref={divRef}
                     >
                         <i className={`mx-3 fa fa-square fa-status-box status-${selectedStatus}-fg`}/>
+                        {" "}
                         {currentValue || "\u00A0"}
                     </div>
                 </InlineHint>

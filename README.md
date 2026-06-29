@@ -56,10 +56,44 @@ public function config(): array
                 'type'  => 'change_status',
             ],
 
-            // Dropdown — priority (values loaded from Mantis priority enum)
+            // Dropdown — any Mantis enum field. Options are built server-side
+            // from `<enum>_enum_string` (declare the enum name in `enum`).
             'bug-priority' => [
                 'field' => 'priority',
                 'type'  => 'select',
+                'enum'  => 'priority',
+            ],
+            'bug-severity' => [
+                'field' => 'severity',
+                'type'  => 'select',
+                'enum'  => 'severity',
+            ],
+            'bug-reproducibility' => [
+                'field' => 'reproducibility',
+                'type'  => 'select',
+                'enum'  => 'reproducibility',
+            ],
+            // Public / private toggle (bug `view_state` column)
+            'bug-view-status' => [
+                'field' => 'view_state',
+                'type'  => 'select',
+                'enum'  => 'view_state',
+            ],
+            'bug-projection' => [
+                'field' => 'projection',
+                'type'  => 'select',
+                'enum'  => 'projection',
+            ],
+            'bug-eta' => [
+                'field' => 'eta',
+                'type'  => 'select',
+                'enum'  => 'eta',
+            ],
+            // Category — options built from the project's category list
+            'bug-category' => [
+                'field'  => 'category_id',
+                'type'   => 'select',
+                'source' => 'category',
             ],
 
         ],
@@ -74,7 +108,7 @@ public function config(): array
 | `text`          | Single-line input      | Summary, short text fields           |
 | `textarea`      | Markdown editor        | Description, notes, long text        |
 | `date`          | Date/time picker       | Due date, any datetime field         |
-| `select`        | Native dropdown        | Priority or other enum fields        |
+| `select`        | Native dropdown        | Any enum field (priority, severity, reproducibility, view_state, projection, eta) or category — options are supplied by PHP via `enum` or `source` |
 | `assign`        | Native dropdown        | Assigned-to (handler)                |
 | `change_status` | Status dropdown + note | Issue status with optional bugnote   |
 

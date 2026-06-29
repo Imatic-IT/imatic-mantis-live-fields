@@ -1,3 +1,13 @@
+// Derive webpack's public path at runtime from this script's own URL so that
+// lazily-loaded chunks resolve through Mantis' plugin_file.php router
+// (e.g. plugin_file.php?file=ImaticLiveFields/index.js&v=123 →
+//  plugin_file.php?file=ImaticLiveFields/<chunk>.js).
+declare let __webpack_public_path__: string;
+const selfScript = document.getElementById('imatic-inline-edit') as HTMLScriptElement | null;
+if (selfScript?.src) {
+    __webpack_public_path__ = selfScript.src.replace(/index\.js.*$/, '');
+}
+
 import {createRoot} from 'react-dom/client';
 import {getConfig} from './utils/utils';
 import {InlineField} from './components/InlineField';

@@ -37,22 +37,3 @@
         box-shadow: -24px 0 #FFF, 24px 0 #5090C1;
     }
 }
-
-/* Input */
-.custom-datepicker .react-datepicker__input-container input {
-    width: 100%;        /* input vyplní celú TD bunku */
-    font-size: 14px;    /* väčší text */
-    padding: 6px 8px;   /* lepšie kliknutie */
-    box-sizing: border-box;
-}
-
-/* Wrapper */
-.custom-datepicker .react-datepicker-wrapper {
-    width: 100%;        /* aby wrapper nezmenšoval input */
-}
-
-/* Dropdown kalendár */
-.custom-datepicker .react-datepicker__calendar {
-    font-size: 14px;    /* väčšie písmo v kalendári */
-    width: 250px;       /* širší dropdown */
-}
